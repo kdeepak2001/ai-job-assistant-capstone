@@ -17,8 +17,10 @@ ENV/
 data/
 *.json
 
-# Streamlit cache
-.streamlit/
+# Allow .streamlit config but ignore cache
+.streamlit/*
+!.streamlit/config.toml
+
 
 # IDE
 .vscode/
