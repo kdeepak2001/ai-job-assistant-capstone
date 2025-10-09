@@ -7,6 +7,7 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
 from reportlab.lib import colors
 from datetime import datetime
 import io
+import re
 
 class PDFExporter:
     """Export resume to PDF with professional templates."""
@@ -38,6 +39,41 @@ class PDFExporter:
         }
     }
     
+    @staticmethod
+    def clean_html(text):
+        """Clean and fix malformed HTML tags."""
+        if not text:
+            return ""
+        
+        # Fix unclosed bold tags
+        text = re.sub(r'<b>([^<]*)<b>', r'<b>\1</b>', text)
+        
+        # Fix double bold tags
+        text = re.sub(r'<b><b>', r'<b>', text)
+        text = re.sub(r'</b></b>', r'</b>', text)
+        
+        # Remove any remaining unclosed tags
+        # Count opening and closing tags
+        open_count = text.count('<b>')
+        close_count = text.count('</b>')
+        
+        if open_count > close_count:
+            # Add missing closing tags
+            text += '</b>' * (open_count - close_count)
+        elif close_count > open_count:
+            # Remove extra closing tags
+            for _ in range(close_count - open_count):
+                text = text.replace('</b>', '', 1)
+        
+        # Escape other special characters
+        text = text.replace('&', '&amp;')
+        text = text.replace('<', '&lt;').replace('>', '&gt;')
+        
+        # Restore the bold tags we want
+        text = text.replace('&lt;b&gt;', '<b>').replace('&lt;/b&gt;', '</b>')
+        
+        return text
+    
     @classmethod
     def export(cls, resume_text: str, template: str = 'modern', 
                candidate_name: str = "Candidate", company_name: str = "Company") -> bytes:
@@ -66,7 +102,7 @@ class PDFExporter:
         name_style = ParagraphStyle(
             'CustomName',
             parent=styles['Heading1'],
-            fontSize=26,
+            fontSize=24,
             textColor=theme['primary_color'],
             spaceAfter=10,
             alignment=TA_CENTER,
@@ -76,23 +112,21 @@ class PDFExporter:
         heading_style = ParagraphStyle(
             'CustomHeading',
             parent=styles['Heading2'],
-            fontSize=14,
+            fontSize=13,
             textColor=theme['secondary_color'],
             spaceAfter=8,
             spaceBefore=12,
-            fontName='Helvetica-Bold',
-            borderWidth=1,
-            borderColor=theme['accent_color'],
-            borderPadding=5
+            fontName='Helvetica-Bold'
         )
         
         body_style = ParagraphStyle(
             'CustomBody',
             parent=styles['Normal'],
-            fontSize=11,
+            fontSize=10,
             textColor=colors.black,
-            alignment=TA_JUSTIFY,
-            spaceAfter=6
+            alignment=TA_LEFT,
+            spaceAfter=4,
+            leading=14
         )
         
         # Header with colored bar
@@ -105,59 +139,80 @@ class PDFExporter:
         elements.append(Spacer(1, 10))
         
         # Candidate Name
-        name = Paragraph(candidate_name.upper(), name_style)
+        safe_name = cls.clean_html(candidate_name.upper())
+        name = Paragraph(safe_name, name_style)
         elements.append(name)
         
         # Target company
+        safe_company = cls.clean_html(company_name)
         target = Paragraph(
-            f"<i>Resume optimized for: {company_name}</i>",
+            f"<i>Optimized for: {safe_company}</i>",
             styles['Normal']
         )
         elements.append(target)
         elements.append(Spacer(1, 15))
         
         # Process resume text by sections
-        sections = resume_text.split('##')
-        
-        for section in sections:
-            if not section.strip():
-                continue
+        try:
+            sections = resume_text.split('##')
             
-            lines = section.strip().split('\n')
-            if not lines:
-                continue
-            
-            # Section heading
-            section_title = lines[0].strip()
-            if section_title:
-                heading = Paragraph(section_title, heading_style)
-                elements.append(heading)
-            
-            # Section content
-            content = '\n'.join(lines[1:]).strip()
-            if content:
-                # Convert markdown bullets to proper formatting
-                content_lines = content.split('\n')
-                for line in content_lines:
-                    if line.strip():
-                        # Handle bullet points
-                        if line.strip().startswith('•') or line.strip().startswith('-'):
-                            line = line.strip().lstrip('•-').strip()
-                            para = Paragraph(f"• {line}", body_style)
-                        elif line.strip().startswith('**'):
-                            # Bold text
-                            line = line.replace('**', '<b>').replace('**', '</b>')
-                            para = Paragraph(line, body_style)
-                        else:
-                            para = Paragraph(line, body_style)
-                        
+            for section in sections:
+                if not section.strip():
+                    continue
+                
+                lines = section.strip().split('\n')
+                if not lines:
+                    continue
+                
+                # Section heading
+                section_title = lines[0].strip()
+                if section_title:
+                    # Clean the title
+                    clean_title = cls.clean_html(section_title)
+                    clean_title = clean_title.replace('<b>', '').replace('</b>', '')
+                    
+                    heading = Paragraph(clean_title, heading_style)
+                    elements.append(heading)
+                
+                # Section content
+                for line in lines[1:]:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    # Clean the line
+                    clean_line = cls.clean_html(line)
+                    
+                    # Handle bullet points
+                    if line.startswith('•') or line.startswith('-') or line.startswith('*'):
+                        clean_line = clean_line.lstrip('•-*').strip()
+                        clean_line = f"• {clean_line}"
+                    
+                    # Create paragraph
+                    try:
+                        para = Paragraph(clean_line, body_style)
                         elements.append(para)
                         elements.append(Spacer(1, 3))
-            
-            elements.append(Spacer(1, 8))
+                    except Exception as e:
+                        # If paragraph fails, add as plain text
+                        plain_text = re.sub(r'<[^>]+>', '', clean_line)
+                        para = Paragraph(plain_text, body_style)
+                        elements.append(para)
+                        elements.append(Spacer(1, 3))
+                
+                elements.append(Spacer(1, 8))
+        
+        except Exception as e:
+            # Fallback: just add plain text
+            plain_text = re.sub(r'<[^>]+>', '', resume_text)
+            for line in plain_text.split('\n'):
+                if line.strip():
+                    para = Paragraph(line.strip(), body_style)
+                    elements.append(para)
+                    elements.append(Spacer(1, 4))
         
         # Footer
-        footer_text = f"Generated by AI Job Assistant | {datetime.now().strftime('%B %Y')}"
+        footer_text = f"Generated by AI Job Assistant PRO | {datetime.now().strftime('%B %Y')}"
         footer = Paragraph(
             f"<font size=8 color='gray'><i>{footer_text}</i></font>",
             styles['Normal']
@@ -166,7 +221,21 @@ class PDFExporter:
         elements.append(footer)
         
         # Build PDF
-        doc.build(elements)
+        try:
+            doc.build(elements)
+        except Exception as e:
+            # If build fails, create a simple text-only version
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            elements = []
+            
+            plain_text = re.sub(r'<[^>]+>', '', resume_text)
+            for line in plain_text.split('\n'):
+                if line.strip():
+                    para = Paragraph(line.strip(), styles['Normal'])
+                    elements.append(para)
+            
+            doc.build(elements)
         
         # Get PDF bytes
         pdf_bytes = buffer.getvalue()
