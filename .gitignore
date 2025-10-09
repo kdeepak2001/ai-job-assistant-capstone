@@ -1,0 +1,37 @@
+# Environment variables (DO NOT COMMIT)
+.env
+*.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Data files
+data/
+*.json
+
+# Streamlit cache
+.streamlit/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PDF test files (optional - remove if you want to keep sample PDFs)
+*.pdf
+
+# Logs
+*.log
