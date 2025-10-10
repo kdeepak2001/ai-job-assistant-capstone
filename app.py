@@ -271,11 +271,32 @@ with st.sidebar:
     st.markdown("### 📊 Your Statistics")
     stats = HistoryTracker.get_stats()
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Apps", stats['total_applications'], delta="+1" if stats['total_applications'] > 0 else None)
-    with col2:
-        st.metric("Avg ATS", f"{stats['avg_ats_score']:.0f}%")
+    if stats['total_applications'] > 0:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.metric("Applications", stats['total_applications'], delta="Tracked")
+        
+        with col2:
+            st.metric("Avg ATS", f"{stats['avg_ats_score']:.0f}%", delta="Score")
+        
+        # Progress bar
+        progress_pct = min(stats['total_applications'] / 10, 1.0)
+        st.progress(progress_pct)
+        st.caption(f"Applications: {stats['total_applications']}/10")
+    else:
+        st.info("📊 No applications yet")
+        st.caption("Generate your first application to start tracking!")
+    
+    st.markdown("---")
+    
+    st.markdown("### ⚡ Current Session")
+    if 'ats_score' in st.session_state:
+        st.success(f"✅ ATS: {st.session_state.ats_score}%")
+        st.caption(f"📍 {st.session_state.get('company_name', 'N/A')}")
+        st.caption(f"⏱️ {st.session_state.get('processing_time', 0)}s")
+    else:
+        st.info("💡 No active session")
     
     st.markdown("---")
     
@@ -288,6 +309,7 @@ with st.sidebar:
     
     st.markdown(f'<span class="tech-badge">🤖 {settings.MODEL_NAME}</span>', unsafe_allow_html=True)
     st.markdown(f'<span class="tech-badge">🌡️ Temp: {settings.TEMPERATURE}</span>', unsafe_allow_html=True)
+
 
 # ============================================================================
 # INITIALIZE SESSION STATE
