@@ -253,7 +253,6 @@ with st.sidebar:
     st.markdown("### ⚡ Quick Actions")
     
     if st.button("🚀 New Application", use_container_width=True, type="primary"):
-        # Clear only generated content, keep inputs
         for key in ['optimized_resume', 'cover_letter', 'interview_prep', 
                     'skill_gap', 'linkedin_headline', 'linkedin_about', 
                     'followup_email', 'ats_score', 'processing_time']:
@@ -296,7 +295,10 @@ with st.sidebar:
 
 if 'chat_agent' not in st.session_state:
     if USE_LANGCHAIN:
-        st.session_state.chat_agent = LangChainChatAgent()
+        try:
+            st.session_state.chat_agent = LangChainChatAgent()
+        except:
+            st.session_state.chat_agent = CareerChatAgent()
     else:
         st.session_state.chat_agent = CareerChatAgent()
 
@@ -418,7 +420,7 @@ with tab1:
 
     st.markdown("---")
     
-    # Options
+    # Options - FIXED RAG SECTION
     st.markdown("### ⚙️ Step 3: Customization Options")
     col5, col6, col7 = st.columns(3)
     
@@ -429,7 +431,14 @@ with tab1:
         include_cover = st.checkbox("✉️ Generate Cover Letter", value=True)
     
     with col7:
-        use_rag = st.checkbox("🧠 Use RAG Enhancement", value=USE_LANGCHAIN, disabled=not USE_LANGCHAIN)
+        if USE_LANGCHAIN:
+            use_rag = st.checkbox("🧠 Use RAG Enhancement", value=True, help="Uses vector database for context from similar resumes")
+            if use_rag:
+                st.success("✅ RAG Active")
+        else:
+            use_rag = False
+            st.warning("⚠️ RAG Unavailable")
+            st.caption("LangChain not installed")
 
     st.markdown("---")
     
@@ -497,16 +506,23 @@ with tab1:
                     st.session_state.company_name = company
                     st.session_state.job_title = job_title
                     
-                    # Initialize agents
+                    # Initialize agents - FIXED RAG LOGIC
                     status.text("🤖 Initializing AI agents...")
                     progress.progress(20)
                     
-                    # Choose agent based on LangChain availability
+                    # Choose resume optimizer based on RAG selection
                     if USE_LANGCHAIN and use_rag:
-                        resume_agent = LangChainResumeAgent()
-                        status.text("🔗 Using LangChain + RAG for optimization...")
+                        try:
+                            status.text("🔗 Initializing LangChain + RAG...")
+                            resume_agent = LangChainResumeAgent()
+                            st.info("✅ Using LangChain with RAG enhancement - searching vector database for similar successful resumes")
+                        except Exception as e:
+                            st.warning(f"⚠️ LangChain initialization failed, using standard optimizer")
+                            resume_agent = ResumeOptimizerAgent()
                     else:
                         resume_agent = ResumeOptimizerAgent()
+                        if not use_rag:
+                            st.info("ℹ️ Using standard optimizer (RAG disabled)")
                     
                     cover_agent = CoverLetterAgent()
                     interview_agent = InterviewAgent()
@@ -514,12 +530,22 @@ with tab1:
                     linkedin_agent = LinkedInAgent()
                     email_agent = EmailAgent()
                     
-                    # Resume optimization
-                    status.text("✍️ Optimizing resume with AI...")
-                    progress.progress(35)
+                    # Resume optimization - FIXED RAG STATUS
+                    if USE_LANGCHAIN and use_rag:
+                        status.text("✍️ Optimizing resume with RAG context...")
+                        progress.progress(35)
+                        st.info("🧠 RAG: Retrieving context from vector database...")
+                    else:
+                        status.text("✍️ Optimizing resume...")
+                        progress.progress(35)
+                    
                     resume_result = resume_agent.optimize(resume_text_val, jd_text_val)
                     st.session_state.optimized_resume = resume_result['optimized_resume']
                     st.session_state.ats_score = resume_result['ats_score']
+                    
+                    # Show RAG confirmation
+                    if resume_result.get('used_rag'):
+                        st.success("✅ RAG enhancement applied! Used context from knowledge base.")
                     
                     # Cover letter
                     if include_cover:
@@ -570,7 +596,8 @@ with tab1:
                         'company': company,
                         'role': job_title,
                         'ats_score': st.session_state.ats_score,
-                        'processing_time': elapsed
+                        'processing_time': elapsed,
+                        'used_rag': resume_result.get('used_rag', False)
                     })
                     
                     status.empty()
