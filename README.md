@@ -63,120 +63,57 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ## 🏗️ System Architecture
 ### 📐 Architecture Flow Diagram
 <div align="center">
-╔══════════════════════════════════════════════════════════╗
-║ 🖥️ USER INTERFACE LAYER ║
-║ Streamlit Web Application ║
-╚═════════════════════╦════════════════════════════════════╝
-↓
-╔═════════════════════════════════════════════════════════╗
-║ 🧭 ORCHESTRATION & ROUTING LAYER ║
-║ Session Management - Workflow Control - Errors ║
-╚═════════════════════╦═══════════════════════════════════╝
-↓
-╔═════════════════════════════════════════════════════════╗
-║ 📂 INPUT PROCESSING LAYER ║
-╠═════════════════════╦═══════════════════╦═══════════════╣
-║ 📄 PDF Parser ║ 🌐 JD Scraper ║ ✍️ Validator ║
-╚═════════════════════╩═══════════════════╩═══════════════╝
-↓
-╔═════════════════════════════════════════════════════════╗
-║ 🧠 MULTI-AGENT PROCESSING SYSTEM ║
-╠═════════╦═════════╦═════════╦═════════╦═════════╦══════╣
-║ 🧾 Resume│💌 Cover │🎯 Interview│🧠 Skill│🔗 LinkedIn│✉️ Email║
-║ Optimizer│ Letter │ Prep │ Gap │ Optimizer│ Gen ║
-╚═════════╩═════════╩═════════╩═════════╩═════════╩══════╝
-↓
-╔═════════════════════════════════════════════════════════╗
-║ 🧬 LANGCHAIN AI FRAMEWORK ║
-║ Prompt Templates - Chain Composition - Memory ║
-╚═════════════════════╦═══════════════════════════════════╝
-↓
-┌────────────┴────────────┐
-↓ ↓
-╔════════════════════╗ ╔════════════════════╗
-║ 🗂️ RAG SYSTEM ║ ║ 🌐 GEMINI API ║
-║ ChromaDB Vector ║←───║ LLM Generation ║
-║ Semantic Search ║ ║ Text Synthesis ║
-╚════════════════════╝ ╚═════════╦══════════╝
-↓
-╔═════════════════════════════════════════════════════════╗
-║ 📤 OUTPUT PROCESSING LAYER ║
-╠═══════════════╦═════════════════╦═══════════════════════╣
-║ 📄 PDF Export ║ 📊 Analytics ║ 💾 History Tracker ║
-║ (4 Templates) ║ Dashboard ║ Application Storage ║
-╚═══════════════╩═════════════════╩═══════════════════════╝
-↓
-╔═════════════════════════════════════════════════════════╗
-║ 💽 STORAGE & CACHE LAYER ║
-║ Session State - Application History - User Prefs ║
-╚═════════════════════════════════════════════════════════╝
+
+| Flow | Layer | Components | Description |
+|:----:|:------|:-----------|:------------|
+| **1** | 🖥️ **USER INTERFACE** | Streamlit Application | User inputs data through web forms and views results |
+| ↓ | | | |
+| **2** | 🧭 **ORCHESTRATION** | Session Manager • Workflow Router | Manages user sessions and routes requests |
+| ↓ | | | |
+| **3** | 📂 **INPUT PROCESSING** | PDF Parser • JD Scraper • Validator | Extracts and validates resume and job description |
+| ↓ | | | |
+| **4** | 🧠 **MULTI-AGENT SYSTEM** | 7 Specialized AI Agents | Processes data through Resume, Cover Letter, Interview, Skills, LinkedIn, Email, Career Coach agents |
+| ↓ | | | |
+| **5** | 🧬 **LANGCHAIN** | Prompt Templates • Chains • Memory | Orchestrates AI workflows and manages context |
+| ↓ | | | |
+| **6** | 🗂️ **RAG** + 🌐 **GEMINI** | ChromaDB • Semantic Search • LLM | Retrieves context and generates AI content |
+| ↓ | | | |
+| **7** | 📤 **OUTPUT** | PDF Exporter • Analytics • Tracker | Exports results and tracks performance |
+| ↓ | | | |
+| **8** | 💽 **STORAGE** | Session State • History • Preferences | Stores user data and application history |
+
 </div>
 ### 📊 Data Flow Summary
 <div align="center">
 
-**USER INPUT** → **ORCHESTRATION** → **INPUT PROCESSING** → **MULTI-AGENT SYSTEM**
-<br/>↓<br/>
-**LANGCHAIN FRAMEWORK** + **RAG SYSTEM** → **GEMINI API**
-<br/>↓<br/>
-**OUTPUT PROCESSING** → **STORAGE & CACHE** → **USER RECEIVES RESULTS**
+| Step | Action |
+|:----:|:-------|
+| **1** | User uploads resume and job description |
+| **2** | System processes and validates input |
+| **3** | Multi-agent system analyzes content |
+| **4** | LangChain orchestrates AI workflows |
+| **5** | RAG retrieves relevant context from database |
+| **6** | Gemini API generates optimized content |
+| **7** | System exports results as PDF and tracks analytics |
+| **8** | Data stored for future reference |
 
 </div>
-
 ### 📊 Layer Architecture
-graph TB
-subgraph UI["🖥️ USER INTERFACE LAYER"]
-UI1[Input Forms]
-UI2[Results Display]
-UI3[Analytics Dashboard]
-end
-subgraph ORCH["🧭 ORCHESTRATION LAYER"]
-    OR1[Session Manager]
-    OR2[Workflow Router]
-    OR3[Error Handler]
-end
+<div align="center">
 
-subgraph INPUT["📂 INPUT PROCESSING LAYER"]
-    IN1[PDF Parser]
-    IN2[Web Scraper]
-    IN3[Text Validator]
-end
+| Layer | Name | Components | Technology | Responsibility |
+|:-----:|:-----|:-----------|:-----------|:---------------|
+| **1** | **🖥️ User Interface** | • Input Forms<br/>• Results Display<br/>• Analytics Dashboard | Streamlit<br/>Custom CSS<br/>Plotly | • User interaction<br/>• Data visualization<br/>• Navigation |
+| **2** | **🧭 Orchestration** | • Session Manager<br/>• Workflow Router<br/>• Error Handler | Python<br/>Session State<br/>Exception Handling | • Request routing<br/>• State management<br/>• Error recovery |
+| **3** | **📂 Input Processing** | • PDF Parser<br/>• Web Scraper<br/>• Text Validator | pdfplumber<br/>PyPDF2<br/>BeautifulSoup4 | • Document extraction<br/>• Data validation<br/>• Text cleaning |
+| **4** | **🧠 Multi-Agent** | • Resume Optimizer<br/>• Cover Letter<br/>• Interview Prep<br/>• Skill Gap<br/>• LinkedIn<br/>• Email Gen<br/>• Career Coach | LangChain<br/>Gemini API<br/>Custom Agents | • Specialized AI processing<br/>• Task-specific optimization<br/>• Content generation |
+| **5** | **🧬 LangChain** | • Prompt Templates<br/>• Chain Composition<br/>• Conversation Memory<br/>• Agent Orchestration | LangChain Framework<br/>Python | • AI workflow management<br/>• Prompt optimization<br/>• Context retention |
+| **6** | **🗂️ RAG System** | • Vector Database<br/>• Semantic Search<br/>• Embedding Generation<br/>• Context Retrieval | ChromaDB<br/>Sentence Transformers<br/>FAISS | • Learning from examples<br/>• Context retrieval<br/>• Pattern recognition |
+| **7** | **🌐 AI Generation** | • LLM API<br/>• Text Generation<br/>• Context Understanding<br/>• Response Synthesis | Google Gemini 2.0<br/>REST API | • Content generation<br/>• Natural language processing<br/>• Text synthesis |
+| **8** | **📤 Output Processing** | • PDF Exporter<br/>• Analytics Tracker<br/>• History Manager | ReportLab<br/>Pandas<br/>Plotly | • Result formatting<br/>• Performance tracking<br/>• Export management |
+| **9** | **💽 Storage & Cache** | • Session State<br/>• Application History<br/>• User Preferences | Streamlit Session<br/>Python Cache<br/>JSON | • Data persistence<br/>• State management<br/>• User settings |
 
-subgraph AGENT["🧠 MULTI-AGENT LAYER"]
-    AG1((Resume<br/>Optimizer))
-    AG2((Cover<br/>Letter))
-    AG3((Interview<br/>Prep))
-    AG4((Skill<br/>Gap))
-    AG5((LinkedIn<br/>Optimizer))
-    AG6((Email<br/>Generator))
-    AG7((Career<br/>Coach))
-end
-
-subgraph AI["🤖 AI PROCESSING LAYER"]
-    AI1[🧬 LangChain]
-    AI2[🗂️ RAG/ChromaDB]
-    AI3[🌐 Gemini API]
-end
-
-subgraph OUTPUT["📤 OUTPUT LAYER"]
-    OUT1[PDF Exporter]
-    OUT2[Analytics Tracker]
-    OUT3[Data Storage]
-end
-
-UI --> ORCH
-ORCH --> INPUT
-INPUT --> AGENT
-AGENT --> AI
-AI --> OUTPUT
-
-style UI fill:#FF4B4B,color:#fff
-style ORCH fill:#1f77b4,color:#fff
-style INPUT fill:#2ca02c,color:#fff
-style AGENT fill:#9467bd,color:#fff
-style AI fill:#ff7f0e,color:#fff
-style OUTPUT fill:#17becf,color:#fff
-
-
+</div>
 ### 🎯 Component Interaction
 
 <div align="center">
@@ -194,51 +131,25 @@ style OUTPUT fill:#17becf,color:#fff
 
 ### 🔗 Simple Flow Diagram
 <div align="center">
-┌─────────────────────────────────────────────────────────┐
-│ 👤 USER INPUT │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 🧭 ORCHESTRATION LAYER │
-│ (Session - Routing - Error Handling) │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 📂 INPUT PROCESSING │
-│ (PDF Parser - JD Scraper - Validator) │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 🧠 MULTI-AGENT SYSTEM │
-│ Resume - Cover Letter - Interview - Skills - LinkedIn │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 🧬 LANGCHAIN + 🗂️ RAG LAYER │
-│ (Prompt Templates - Semantic Search - Context) │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 🌐 GOOGLE GEMINI API │
-│ (LLM Generation - Text Synthesis) │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 📤 OUTPUT PROCESSING │
-│ (PDF Export - Analytics - Tracking) │
-└────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────┐
-│ 💽 STORAGE & CACHE │
-│ (History - Sessions - User Preferences) │
-└─────────────────────────────────────────────────────────┘
+
+| Step                                | Visual          |
+|--------------------------------------|-----------------|
+| **User Input**                       | 👤              |
+| ↓                                    |                 |
+| **Orchestration Layer**              | 🧭              |
+| ↓                                    |                 |
+| **Input Processing**                 | 📂              |
+| ↓                                    |                 |
+| **Multi-Agent System**               | 🧠              |
+| ↓                                    |                 |
+| **LangChain + RAG**                  | 🧬 + 🗂️          |
+| ↓                                    |                 |
+| **Gemini API**                       | 🌐              |
+| ↓                                    |                 |
+| **Output Processing**                | 📤              |
+| ↓                                    |                 |
+| **Storage & Cache**                  | 💽              |
+
 </div>
 ---
 
@@ -373,7 +284,7 @@ Create `.env` file with:
 GEMINI_API_KEY=your_gemini_api_key_here
 MODEL_NAME=gemini-2.0-flash-exp
 TEMPERATURE=0.4
-
+undefined
 ---
 
 ## 📁 Project Structure
