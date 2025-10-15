@@ -1,6 +1,6 @@
-
+<div align="center">
 # 🤖 AI Job Application Assistant PRO
-
+</div>
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://ai-job-assistant-tool.streamlit.app/)
@@ -59,7 +59,6 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 </div>
 
 ---
-
 ## 🏗️ System Architecture
 ### 📐 Architecture Flow Diagram
 <div align="center">
@@ -67,22 +66,24 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | Flow | Layer | Components | Description |
 |:----:|:------|:-----------|:------------|
 | **1** | 🖥️ **USER INTERFACE** | Streamlit Application | User inputs data through web forms and views results |
-| ↓ | | | |
+| ↓ |
 | **2** | 🧭 **ORCHESTRATION** | Session Manager • Workflow Router | Manages user sessions and routes requests |
-| ↓ | | | |
+| ↓ |
 | **3** | 📂 **INPUT PROCESSING** | PDF Parser • JD Scraper • Validator | Extracts and validates resume and job description |
-| ↓ | | | |
+| ↓ |
 | **4** | 🧠 **MULTI-AGENT SYSTEM** | 7 Specialized AI Agents | Processes data through Resume, Cover Letter, Interview, Skills, LinkedIn, Email, Career Coach agents |
-| ↓ | | | |
+| ↓ |
 | **5** | 🧬 **LANGCHAIN** | Prompt Templates • Chains • Memory | Orchestrates AI workflows and manages context |
-| ↓ | | | |
+| ↓ |
 | **6** | 🗂️ **RAG** + 🌐 **GEMINI** | ChromaDB • Semantic Search • LLM | Retrieves context and generates AI content |
-| ↓ | | | |
+| ↓ |
 | **7** | 📤 **OUTPUT** | PDF Exporter • Analytics • Tracker | Exports results and tracks performance |
-| ↓ | | | |
+| ↓ |
 | **8** | 💽 **STORAGE** | Session State • History • Preferences | Stores user data and application history |
 
 </div>
+---
+
 ### 📊 Data Flow Summary
 <div align="center">
 
@@ -98,6 +99,8 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | **8** | Data stored for future reference |
 
 </div>
+---
+
 ### 📊 Layer Architecture
 <div align="center">
 
@@ -114,6 +117,7 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | **9** | **💽 Storage & Cache** | • Session State<br/>• Application History<br/>• User Preferences | Streamlit Session<br/>Python Cache<br/>JSON | • Data persistence<br/>• State management<br/>• User settings |
 
 </div>
+---
 ### 🎯 Component Interaction
 
 <div align="center">
@@ -135,19 +139,19 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | Step                                | Visual          |
 |--------------------------------------|-----------------|
 | **User Input**                       | 👤              |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **Orchestration Layer**              | 🧭              |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **Input Processing**                 | 📂              |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **Multi-Agent System**               | 🧠              |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **LangChain + RAG**                  | 🧬 + 🗂️          |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **Gemini API**                       | 🌐              |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **Output Processing**                | 📤              |
-| ↓                                    |                 |
+        ↓                              |                 |
 | **Storage & Cache**                  | 💽              |
 
 </div>
@@ -172,11 +176,8 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ---
 
 ## 🚀 Features
-
 ### 🎯 Core Capabilities
-
 <div align="center">
-
 | 📄 **Resume Optimization** | ✉️ **Cover Letter Generation** | 💼 **Interview Preparation** |
 |:---------------------------|:--------------------------------|:------------------------------|
 | ✅ 92% ATS compatibility | ✅ Personalized content | ✅ Role-specific questions |
@@ -187,7 +188,9 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 
 </div>
 
+
 <div align="center">
+
 
 | 🔍 **Skill Gap Analysis** | 🔗 **LinkedIn Optimizer** | 📧 **Email Templates** |
 |:---------------------------|:---------------------------|:-----------------------|
@@ -203,6 +206,7 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 
 <div align="center">
 
+
 | Feature | Description |
 |:--------|:------------|
 | 💬 **AI Career Coach** | Real-time guidance • Context-aware responses • Conversation memory |
@@ -215,7 +219,6 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ---
 
 ## 🛠️ Technology Stack
-
 ### 💻 Complete Stack Overview
 
 <div align="center">
@@ -230,9 +233,8 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | **☁️ Deployment** | Streamlit Cloud • Git/GitHub • Environment Variables |
 
 </div>
-
+---
 ### 🏷️ Technology Badges
-
 <div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
@@ -249,9 +251,7 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ---
 
 ## 🚀 Quick Start
-
 ### 📋 Prerequisites
-
 <div align="center">
 
 | Requirement | Version | Download Link |
@@ -261,6 +261,7 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | **Git** | Latest | [git-scm.com](https://git-scm.com) |
 
 </div>
+---
 
 ### ⚡ Installation Steps
 
@@ -277,14 +278,14 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 | **7️⃣ Run** | `streamlit run app.py` | Start application |
 
 </div>
-
+---
 ### ⚙️ Environment Configuration
-
-Create `.env` file with:
+### Create `.env` file with:
 GEMINI_API_KEY=your_gemini_api_key_here
 MODEL_NAME=gemini-2.0-flash-exp
 TEMPERATURE=0.4
 undefined
+
 ---
 
 ## 📁 Project Structure
@@ -325,7 +326,7 @@ undefined
 **🌐 Live Application:** [https://ai-job-assistant-tool.streamlit.app/](https://ai-job-assistant-tool.streamlit.app/)
 
 </div>
-
+---
 ### 📝 Step-by-Step Workflow
 
 <div align="center">
@@ -345,7 +346,6 @@ undefined
 ---
 
 ## 📊 Performance & Metrics
-
 ### ⚡ Speed Benchmarks
 
 <div align="center">
@@ -359,9 +359,8 @@ undefined
 | **⚡ Total Processing** | **28.3 seconds avg** | **✅ Production-Ready** |
 
 </div>
-
+---
 ### 🎯 Accuracy Metrics
-
 <div align="center">
 
 | Metric | Score | Performance |
@@ -373,9 +372,8 @@ undefined
 | **Error Rate** | < 2% | ⭐⭐⭐⭐⭐ Excellent |
 
 </div>
-
+---
 ### 📈 Scale & Reliability
-
 <div align="center">
 
 | Metric | Value | Status |
@@ -438,7 +436,6 @@ undefined
 ---
 
 ## 📈 Roadmap
-
 ### 🚧 Planned Features
 
 <div align="center">
@@ -453,9 +450,8 @@ undefined
 | **🏢 Enterprise** | Company culture analysis • Team collaboration |
 
 </div>
-
+---
 ### 🔧 Technical Improvements
-
 <div align="center">
 
 | Improvement | Technology |
