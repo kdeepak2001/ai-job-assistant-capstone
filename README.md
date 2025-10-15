@@ -94,44 +94,16 @@ style H fill:#17becf,stroke:#333,stroke-width:2px,color:#fff
 style I fill:#bcbd22,stroke:#333,stroke-width:2px,color:#000
 style J fill:#7f7f7f,stroke:#333,stroke-width:2px,color:#fff
 
-### 🔄 Data Flow
-flowchart TD
-START([👤 User Input]) --> A[🧭 Orchestration Layer]
-A --> B{📂 Input Processing}
-B -->|PDF| C[📄 PDF Parser]
-B -->|URL| D[🌐 JD Scraper]
-B -->|Text| E[✍️ Text Validator]
-C & D & E --> F[⚙️ Agent Controller]
+### 📊 Data Flow Summary
+<div align="center">
 
-F --> G1[🧾 Resume Optimizer]
-F --> G2[💌 Cover Letter]
-F --> G3[🎯 Interview Prep]
-F --> G4[🧠 Skill Gap]
-F --> G5[🔗 LinkedIn]
-F --> G6[✉️ Email Gen]
-F --> G7[🗣️ Career Chat]
+**USER INPUT** → **ORCHESTRATION** → **INPUT PROCESSING** → **MULTI-AGENT SYSTEM**
+<br/>↓<br/>
+**LANGCHAIN FRAMEWORK** + **RAG SYSTEM** → **GEMINI API**
+<br/>↓<br/>
+**OUTPUT PROCESSING** → **STORAGE & CACHE** → **USER RECEIVES RESULTS**
 
-G1 & G2 & G3 & G4 & G5 & G6 & G7 --> H[🧬 LangChain Layer]
-H --> I[(🗂️ RAG System<br/>ChromaDB)]
-H --> J[🌐 Gemini API]
-
-I -.Context.-> J
-J --> K{📤 Output Processing}
-K -->|Export| L[📄 PDF Generator]
-K -->|Track| M[📊 Analytics]
-K -->|Store| N[(💽 Database)]
-
-L & M & N --> END([✅ Results Delivered])
-
-style START fill:#FF4B4B,stroke:#333,stroke-width:3px,color:#fff
-style END fill:#2ca02c,stroke:#333,stroke-width:3px,color:#fff
-style A fill:#1f77b4,stroke:#333,stroke-width:2px,color:#fff
-style B fill:#ff7f0e,stroke:#333,stroke-width:2px,color:#fff
-style F fill:#9467bd,stroke:#333,stroke-width:2px,color:#fff
-style H fill:#d62728,stroke:#333,stroke-width:2px,color:#fff
-style I fill:#8c564b,stroke:#333,stroke-width:2px,color:#fff
-style J fill:#17becf,stroke:#333,stroke-width:2px,color:#fff
-style K fill:#bcbd22,stroke:#333,stroke-width:2px,color:#000
+</div>
 
 ### 📊 Layer Architecture
 graph TB
@@ -204,7 +176,7 @@ style OUTPUT fill:#17becf,color:#fff
 </div>
 
 ### 🔗 Simple Flow Diagram
-
+<div align="center">
 ┌─────────────────────────────────────────────────────────┐
 │ 👤 USER INPUT │
 └────────────────────────┬────────────────────────────────┘
@@ -250,7 +222,7 @@ style OUTPUT fill:#17becf,color:#fff
 │ 💽 STORAGE & CACHE │
 │ (History - Sessions - User Preferences) │
 └─────────────────────────────────────────────────────────┘
-
+</div>
 ---
 
 ### 🤖 Multi-Agent System
