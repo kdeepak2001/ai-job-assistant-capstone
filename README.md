@@ -129,26 +129,30 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 
 </div>
 
-### 🔗 Simple Flow Diagram
+## 📊 Simple Flow Diagram
+
 <div align="center">
 
-👤 → 🧭 → 📂 → 🧠 → 🧬+🗂️ → 🌐 → 📤 → 💽
+| Step                                | Visual          |
+|--------------------------------------|-----------------|
+| **User Input**                       | 👤              |
+| ↓                                    |                 |
+| **Orchestration Layer**              | 🧭              |
+| ↓                                    |                 |
+| **Input Processing**                 | 📂              |
+| ↓                                    |                 |
+| **Multi-Agent System**               | 🧠              |
+| ↓                                    |                 |
+| **LangChain + RAG**                  | 🧬 + 🗂️          |
+| ↓                                    |                 |
+| **Gemini API**                       | 🌐              |
+| ↓                                    |                 |
+| **Output Processing**                | 📤              |
+| ↓                                    |                 |
+| **Storage & Cache**                  | 💽              |
 
 </div>
-<div align="center">
-| Emoji | Represents            |
-|-------|----------------------|
-| 👤    | User Input           |
-| 🧭    | Orchestration        |
-| 📂    | Input Processing     |
-| 🧠    | Multi-Agent System   |
-| 🧬    | LangChain            |
-| 🗂️   | RAG System           |
-| 🌐    | Gemini API           |
-| 📤    | Output Processing    |
-| 💽    | Storage & Cache      |
 
-</div>
 
 ### 🤖 Multi-Agent System
 
@@ -171,16 +175,16 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ## 🚀 Features
 ### 🎯 Core Capabilities
 <div align="center">
+
 | 📄 **Resume Optimization** | ✉️ **Cover Letter Generation** | 💼 **Interview Preparation** |
-|:---------------------------|:--------------------------------|:-------------------------|
+|:---------------------------|:--------------------------------|:------------------------------|
 | ✅ 92% ATS compatibility | ✅ Personalized content | ✅ Role-specific questions |
-| ✅ Keyword integration | ✅ Company research | ✅ STAR-format answers |
-| ✅ Quantified achievements | ✅ Industry terminology | ✅ Company culture insights |
-| ✅ STAR framework | ✅ Achievement highlighting | ✅ Confidence-building |
-| ✅ 4 PDF templates | ✅ Professional tone | ✅ Mock interview prep |
+| ✅ Intelligent keyword integration | ✅ Company research integration | ✅ STAR-format answer templates |
+| ✅ Quantified achievements | ✅ Industry-specific terminology | ✅ Company culture insights |
+| ✅ STAR framework implementation | ✅ Achievement highlighting | ✅ Confidence-building strategies |
+| ✅ 4 professional PDF templates | ✅ Professional tone matching | ✅ Mock interview preparation |
 
 </div>
-
 
 <div align="center">
 
