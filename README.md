@@ -61,44 +61,197 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ---
 
 ## 🏗️ System Architecture
-
 ### 📐 Architecture Flow Diagram
+graph LR
+A((🖥️ USER
+INTERFACE)) --> B[🧭 ORCHESTRATION
+LAYER]
+B --> C{📂 INPUT
+LAYER}
+C --> D[⚙️ PROCESSING
+CONTROLLER]
+D --> E((🧠 MULTI-AGENT
+SYSTEM))
+E --> F[🧬 LANGCHAIN
+FRAMEWORK]
+F --> G[(🗂️ RAG
+ChromaDB)]
+F --> H[🌐 GEMINI
+API]
+H --> I{📤 OUTPUT
+PROCESSOR}
+I --> J[(💽 STORAGE
+& CACHE)]
 
-flowchart TB
-    UI[🖥️ USER INTERFACE<br/>Streamlit Application]
-    
-    UI --> ORCH[🧭 ORCHESTRATION<br/>Session & Workflow]
-    
-    ORCH --> INPUT[📂 INPUT LAYER<br/>Parser -  Scraper -  Validator]
-    
-    INPUT --> AGENT[🧠 MULTI-AGENT SYSTEM<br/>7 Specialized Agents]
-    
-    AGENT --> LC[🧬 LANGCHAIN<br/>Prompts -  Chains -  Memory]
-    
-    LC --> RAG[🗂️ RAG SYSTEM<br/>ChromaDB -  Search -  Embeddings]
-    
-    LC --> API[🌐 GEMINI API<br/>LLM Generation]
-    
-    API --> OUT[📤 OUTPUT<br/>PDF -  Analytics -  Storage]
-    
-    style UI fill:#FF4B4B,color:#fff
-    style ORCH fill:#1f77b4,color:#fff
-    style INPUT fill:#2ca02c,color:#fff
-    style AGENT fill:#9467bd,color:#fff
-    style LC fill:#ff7f0e,color:#fff
-    style RAG fill:#d62728,color:#fff
-    style API fill:#17becf,color:#fff
-    style OUT fill:#bcbd22,color:#fff
+style A fill:#FF4B4B,stroke:#333,stroke-width:3px,color:#fff
+style B fill:#1f77b4,stroke:#333,stroke-width:2px,color:#fff
+style C fill:#2ca02c,stroke:#333,stroke-width:2px,color:#fff
+style D fill:#d62728,stroke:#333,stroke-width:2px,color:#fff
+style E fill:#9467bd,stroke:#333,stroke-width:3px,color:#fff
+style F fill:#ff7f0e,stroke:#333,stroke-width:2px,color:#fff
+style G fill:#8c564b,stroke:#333,stroke-width:2px,color:#fff
+style H fill:#17becf,stroke:#333,stroke-width:2px,color:#fff
+style I fill:#bcbd22,stroke:#333,stroke-width:2px,color:#000
+style J fill:#7f7f7f,stroke:#333,stroke-width:2px,color:#fff
 
 ### 🔄 Data Flow
+flowchart TD
+START([👤 User Input]) --> A[🧭 Orchestration Layer]
+A --> B{📂 Input Processing}
+B -->|PDF| C[📄 PDF Parser]
+B -->|URL| D[🌐 JD Scraper]
+B -->|Text| E[✍️ Text Validator]
+C & D & E --> F[⚙️ Agent Controller]
+
+F --> G1[🧾 Resume Optimizer]
+F --> G2[💌 Cover Letter]
+F --> G3[🎯 Interview Prep]
+F --> G4[🧠 Skill Gap]
+F --> G5[🔗 LinkedIn]
+F --> G6[✉️ Email Gen]
+F --> G7[🗣️ Career Chat]
+
+G1 & G2 & G3 & G4 & G5 & G6 & G7 --> H[🧬 LangChain Layer]
+H --> I[(🗂️ RAG System<br/>ChromaDB)]
+H --> J[🌐 Gemini API]
+
+I -.Context.-> J
+J --> K{📤 Output Processing}
+K -->|Export| L[📄 PDF Generator]
+K -->|Track| M[📊 Analytics]
+K -->|Store| N[(💽 Database)]
+
+L & M & N --> END([✅ Results Delivered])
+
+style START fill:#FF4B4B,stroke:#333,stroke-width:3px,color:#fff
+style END fill:#2ca02c,stroke:#333,stroke-width:3px,color:#fff
+style A fill:#1f77b4,stroke:#333,stroke-width:2px,color:#fff
+style B fill:#ff7f0e,stroke:#333,stroke-width:2px,color:#fff
+style F fill:#9467bd,stroke:#333,stroke-width:2px,color:#fff
+style H fill:#d62728,stroke:#333,stroke-width:2px,color:#fff
+style I fill:#8c564b,stroke:#333,stroke-width:2px,color:#fff
+style J fill:#17becf,stroke:#333,stroke-width:2px,color:#fff
+style K fill:#bcbd22,stroke:#333,stroke-width:2px,color:#000
+
+### 📊 Layer Architecture
+graph TB
+subgraph UI["🖥️ USER INTERFACE LAYER"]
+UI1[Input Forms]
+UI2[Results Display]
+UI3[Analytics Dashboard]
+end
+subgraph ORCH["🧭 ORCHESTRATION LAYER"]
+    OR1[Session Manager]
+    OR2[Workflow Router]
+    OR3[Error Handler]
+end
+
+subgraph INPUT["📂 INPUT PROCESSING LAYER"]
+    IN1[PDF Parser]
+    IN2[Web Scraper]
+    IN3[Text Validator]
+end
+
+subgraph AGENT["🧠 MULTI-AGENT LAYER"]
+    AG1((Resume<br/>Optimizer))
+    AG2((Cover<br/>Letter))
+    AG3((Interview<br/>Prep))
+    AG4((Skill<br/>Gap))
+    AG5((LinkedIn<br/>Optimizer))
+    AG6((Email<br/>Generator))
+    AG7((Career<br/>Coach))
+end
+
+subgraph AI["🤖 AI PROCESSING LAYER"]
+    AI1[🧬 LangChain]
+    AI2[🗂️ RAG/ChromaDB]
+    AI3[🌐 Gemini API]
+end
+
+subgraph OUTPUT["📤 OUTPUT LAYER"]
+    OUT1[PDF Exporter]
+    OUT2[Analytics Tracker]
+    OUT3[Data Storage]
+end
+
+UI --> ORCH
+ORCH --> INPUT
+INPUT --> AGENT
+AGENT --> AI
+AI --> OUTPUT
+
+style UI fill:#FF4B4B,color:#fff
+style ORCH fill:#1f77b4,color:#fff
+style INPUT fill:#2ca02c,color:#fff
+style AGENT fill:#9467bd,color:#fff
+style AI fill:#ff7f0e,color:#fff
+style OUTPUT fill:#17becf,color:#fff
+
+
+### 🎯 Component Interaction
 
 <div align="center">
 
-USER INPUT → ORCHESTRATION → INPUT LAYER → PROCESSING → MULTI-AGENT SYSTEM
-       ↓
-LANGCHAIN + RAG → GEMINI API → OUTPUT PROCESSING → STORAGE & CACHE
+| Layer | Components | Function |
+|:------|:-----------|:---------|
+| **🖥️ UI** | Forms • Display • Dashboard | User interaction & visualization |
+| **🧭 Orchestration** | Session • Routing • Errors | Request management & state control |
+| **📂 Input** | PDF • Scraper • Validator | Data extraction & validation |
+| **🧠 Agents** | 7 Specialized Agents | Task-specific AI processing |
+| **🤖 AI Layer** | LangChain • RAG • Gemini | AI generation & context retrieval |
+| **📤 Output** | PDF • Analytics • Storage | Results delivery & tracking |
 
 </div>
+
+### 🔗 Simple Flow Diagram
+
+┌─────────────────────────────────────────────────────────┐
+│ 👤 USER INPUT │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 🧭 ORCHESTRATION LAYER │
+│ (Session - Routing - Error Handling) │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 📂 INPUT PROCESSING │
+│ (PDF Parser - JD Scraper - Validator) │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 🧠 MULTI-AGENT SYSTEM │
+│ Resume - Cover Letter - Interview - Skills - LinkedIn │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 🧬 LANGCHAIN + 🗂️ RAG LAYER │
+│ (Prompt Templates - Semantic Search - Context) │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 🌐 GOOGLE GEMINI API │
+│ (LLM Generation - Text Synthesis) │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 📤 OUTPUT PROCESSING │
+│ (PDF Export - Analytics - Tracking) │
+└────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────┐
+│ 💽 STORAGE & CACHE │
+│ (History - Sessions - User Preferences) │
+└─────────────────────────────────────────────────────────┘
+
+---
 
 ### 🤖 Multi-Agent System
 
@@ -228,12 +381,9 @@ LANGCHAIN + RAG → GEMINI API → OUTPUT PROCESSING → STORAGE & CACHE
 ### ⚙️ Environment Configuration
 
 Create `.env` file with:
-
-```
 GEMINI_API_KEY=your_gemini_api_key_here
 MODEL_NAME=gemini-2.0-flash-exp
 TEMPERATURE=0.4
-```
 
 ---
 
@@ -501,32 +651,3 @@ ECE Graduate | AI Enthusiast |
 </div>
 
 ***
-
-## 🎯 What Makes This README Outstanding:
-
-### ✅ **Creative Table Formatting:**
-- All key information in clean, scannable tables
-- Emoji-enhanced visual hierarchy
-- Centered alignment for professional look
-- Color-coded categories
-
-### ✅ **2025 Best Practices:**
-- Table of contents for easy navigation
-- Centered badges and sections
-- Mermaid architecture diagram
-- Collapsible troubleshooting
-- Clear call-to-actions
-
-### ✅ **Copy-Paste Ready:**
-- Complete markdown formatting
-- All links work (update your personal links)
-- Professional structure
-- No missing sections
-- Ready for GitHub display
-
-### ✅ **Recruiter-Friendly:**
-- Key metrics front and center
-- Clear value proposition
-- Easy-to-scan tables
-- Professional presentation
-- Contact info prominent
