@@ -1,6 +1,4 @@
-***
 
-```markdown
 # 🤖 AI Job Application Assistant PRO
 
 <div align="center">
