@@ -2,7 +2,6 @@ Perfect! Here's your **ULTIMATE GitHub-ready README.md** with the stunning Merma
 
 ---
 
-```markdown
 # 🤖 AI Job Application Assistant PRO
 
 <div align="center">
@@ -47,7 +46,6 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 
 ### 📐 High-Level Architecture Overview
 
-```
 flowchart TD
     %% === USER INTERFACE ===
     UI[🖥️ USER INTERFACE<br/>Streamlit Web Application]
@@ -158,11 +156,9 @@ flowchart TD
     class GEM gemClass
     class OUT,OUTL,O1,O2 outClass
     class STORE storeClass
-```
 
 ### 🔄 End-to-End Data Flow
 
-```
 USER INPUT
    ↓
 🧭 ORCHESTRATION LAYER (Routing + State Management)
@@ -180,7 +176,8 @@ USER INPUT
 📤 OUTPUT PROCESSING (PDF Export / Analytics)
    ↓
 💽 STORAGE & CACHE (History, Sessions, Preferences)
-```
+
+---
 
 ### 🧩 Agent Architecture Details
 
