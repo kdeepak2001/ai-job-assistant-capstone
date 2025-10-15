@@ -62,38 +62,55 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 
 ## 🏗️ System Architecture
 ### 📐 Architecture Flow Diagram
-graph LR
-A((🖥️ USER
-INTERFACE)) --> B[🧭 ORCHESTRATION
-LAYER]
-B --> C{📂 INPUT
-LAYER}
-C --> D[⚙️ PROCESSING
-CONTROLLER]
-D --> E((🧠 MULTI-AGENT
-SYSTEM))
-E --> F[🧬 LANGCHAIN
-FRAMEWORK]
-F --> G[(🗂️ RAG
-ChromaDB)]
-F --> H[🌐 GEMINI
-API]
-H --> I{📤 OUTPUT
-PROCESSOR}
-I --> J[(💽 STORAGE
-& CACHE)]
-
-style A fill:#FF4B4B,stroke:#333,stroke-width:3px,color:#fff
-style B fill:#1f77b4,stroke:#333,stroke-width:2px,color:#fff
-style C fill:#2ca02c,stroke:#333,stroke-width:2px,color:#fff
-style D fill:#d62728,stroke:#333,stroke-width:2px,color:#fff
-style E fill:#9467bd,stroke:#333,stroke-width:3px,color:#fff
-style F fill:#ff7f0e,stroke:#333,stroke-width:2px,color:#fff
-style G fill:#8c564b,stroke:#333,stroke-width:2px,color:#fff
-style H fill:#17becf,stroke:#333,stroke-width:2px,color:#fff
-style I fill:#bcbd22,stroke:#333,stroke-width:2px,color:#000
-style J fill:#7f7f7f,stroke:#333,stroke-width:2px,color:#fff
-
+<div align="center">
+╔══════════════════════════════════════════════════════════╗
+║ 🖥️ USER INTERFACE LAYER ║
+║ Streamlit Web Application ║
+╚═════════════════════╦════════════════════════════════════╝
+↓
+╔═════════════════════════════════════════════════════════╗
+║ 🧭 ORCHESTRATION & ROUTING LAYER ║
+║ Session Management - Workflow Control - Errors ║
+╚═════════════════════╦═══════════════════════════════════╝
+↓
+╔═════════════════════════════════════════════════════════╗
+║ 📂 INPUT PROCESSING LAYER ║
+╠═════════════════════╦═══════════════════╦═══════════════╣
+║ 📄 PDF Parser ║ 🌐 JD Scraper ║ ✍️ Validator ║
+╚═════════════════════╩═══════════════════╩═══════════════╝
+↓
+╔═════════════════════════════════════════════════════════╗
+║ 🧠 MULTI-AGENT PROCESSING SYSTEM ║
+╠═════════╦═════════╦═════════╦═════════╦═════════╦══════╣
+║ 🧾 Resume│💌 Cover │🎯 Interview│🧠 Skill│🔗 LinkedIn│✉️ Email║
+║ Optimizer│ Letter │ Prep │ Gap │ Optimizer│ Gen ║
+╚═════════╩═════════╩═════════╩═════════╩═════════╩══════╝
+↓
+╔═════════════════════════════════════════════════════════╗
+║ 🧬 LANGCHAIN AI FRAMEWORK ║
+║ Prompt Templates - Chain Composition - Memory ║
+╚═════════════════════╦═══════════════════════════════════╝
+↓
+┌────────────┴────────────┐
+↓ ↓
+╔════════════════════╗ ╔════════════════════╗
+║ 🗂️ RAG SYSTEM ║ ║ 🌐 GEMINI API ║
+║ ChromaDB Vector ║←───║ LLM Generation ║
+║ Semantic Search ║ ║ Text Synthesis ║
+╚════════════════════╝ ╚═════════╦══════════╝
+↓
+╔═════════════════════════════════════════════════════════╗
+║ 📤 OUTPUT PROCESSING LAYER ║
+╠═══════════════╦═════════════════╦═══════════════════════╣
+║ 📄 PDF Export ║ 📊 Analytics ║ 💾 History Tracker ║
+║ (4 Templates) ║ Dashboard ║ Application Storage ║
+╚═══════════════╩═════════════════╩═══════════════════════╝
+↓
+╔═════════════════════════════════════════════════════════╗
+║ 💽 STORAGE & CACHE LAYER ║
+║ Session State - Application History - User Prefs ║
+╚═════════════════════════════════════════════════════════╝
+</div>
 ### 📊 Data Flow Summary
 <div align="center">
 
