@@ -45,7 +45,6 @@ AI Job Application Assistant PRO is a production-ready automation platform that 
 ## 🏗️ System Architecture
 
 ### 📐 High-Level Architecture Overview
-
 flowchart TD
     %% === USER INTERFACE ===
     UI[🖥️ USER INTERFACE<br/>Streamlit Web Application]
@@ -298,15 +297,11 @@ USER INPUT
 
 ### Prerequisites
 
-```
 ✅ Python 3.11 or higher
 ✅ Google Gemini API key (Get it free at: https://ai.google.dev/)
 ✅ Git
-```
 
 ### 🚀 Quick Start
-
-```
 # 1. Clone the repository
 git clone https://github.com/kdeepak2001/ai-job-assistant-capstone.git
 cd ai-job-assistant-capstone
@@ -328,17 +323,14 @@ echo GEMINI_API_KEY=your_api_key_here > .env
 
 # 6. Run the application
 streamlit run app.py
-```
 
 ### ⚙️ Environment Configuration
 
 Create a `.env` file in the project root:
 
-```
 GEMINI_API_KEY=your_gemini_api_key_here
 MODEL_NAME=gemini-2.0-flash-exp
 TEMPERATURE=0.4
-```
 
 ### 🔑 Get Your FREE Gemini API Key
 
@@ -351,7 +343,6 @@ TEMPERATURE=0.4
 
 ## 📁 Project Structure
 
-```
 ai-job-assistant-capstone/
 │
 ├── 📄 app.py                      # Main Streamlit application
@@ -388,7 +379,6 @@ ai-job-assistant-capstone/
 │
 └── 🎨 .streamlit/
     └── config.toml                # Streamlit configuration
-```
 
 ---
 
@@ -400,7 +390,6 @@ Visit: **[https://ai-job-assistant-tool.streamlit.app/](https://ai-job-assistant
 
 ### 📝 Step-by-Step Workflow
 
-```
 1️⃣ INPUT YOUR DOCUMENTS
    -  Paste resume and job description text
    -  Upload PDF files
@@ -423,8 +412,6 @@ Visit: **[https://ai-job-assistant-tool.streamlit.app/](https://ai-job-assistant
    -  Navigate through 6 interactive tabs
    -  Download PDFs, TXT, or CSV files
    -  Track analytics and history
-
-```
 
 ---
 
