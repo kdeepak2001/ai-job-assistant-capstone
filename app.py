@@ -5,18 +5,24 @@ Modern UI with LangChain + RAG - Complete Capstone Project
 
 import sys
 import os
-
-# --- 🚨 CRITICAL FIX: Add Root Directory to Path 🚨 ---
-# This must run BEFORE importing 'src' or 'config'
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-# -----------------------------------------------------
-
 import streamlit as st
+
+# --- 🚨 CRITICAL PATH FIX 🚨 ---
+# We use insert(0) to ensure the local 'src' folder takes precedence over installed packages
+# This fixes the KeyError: 'src' issues on Streamlit Cloud
+root_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, root_dir)
+
+# Debug: Print path to logs to verify (check "Manage App" logs if this fails)
+print(f"🔧 Root Directory added to sys.path: {root_dir}")
+print(f"📂 Current Working Directory: {os.getcwd()}")
+# -------------------------------
+
 import time
 from datetime import datetime
 import pandas as pd
 
-# Real imports
+# Real imports wrapped in try-except to catch specific import errors
 try:
     from config.settings import settings
     from src.parsers.pdf_parser import PDFParser
@@ -31,10 +37,12 @@ try:
     from src.utils.jd_scraper import JobDescriptionScraper
     from src.utils.pdf_exporter import PDFExporter
     from ui.components import render_ats_gauge, render_stats
-except ImportError as e:
-    st.error(f"❌ Import Error: {e}")
-    st.info("💡 Hint: Make sure __init__.py files exist in all folders (src, config, ui)")
+except Exception as e:
+    st.error(f"❌ critical Import Error: {e}")
+    st.code(f"Sys Path: {sys.path}", language="python") # Show path for debugging
     st.stop()
+
+# ... rest of your code (LangChain imports, page config, etc.) ...
 
 # LangChain imports (optional)
 try:
