@@ -5,30 +5,36 @@ Modern UI with LangChain + RAG - Complete Capstone Project
 
 import sys
 import os
+
+# --- 🚨 CRITICAL FIX: Add Root Directory to Path 🚨 ---
+# This must run BEFORE importing 'src' or 'config'
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# -----------------------------------------------------
+
 import streamlit as st
 import time
 from datetime import datetime
 import pandas as pd
 
-# --- 🚨 CRITICAL FIX: Add Root Directory to Path 🚨 ---
-# This line tells Streamlit where to find your 'src' and 'config' folders
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-# -----------------------------------------------------
-
-# Real imports (Now these will work!)
-from config.settings import settings
-from src.parsers.pdf_parser import PDFParser
-from src.agents.resume_optimizer import ResumeOptimizerAgent
-from src.agents.cover_letter_agent import CoverLetterAgent
-from src.agents.interview_agent import InterviewAgent
-from src.agents.skill_gap_agent import SkillGapAgent
-from src.agents.linkedin_agent import LinkedInAgent
-from src.agents.email_agent import EmailAgent
-from src.agents.career_chat_agent import CareerChatAgent
-from src.utils.history_tracker import HistoryTracker
-from src.utils.jd_scraper import JobDescriptionScraper
-from src.utils.pdf_exporter import PDFExporter
-from ui.components import render_ats_gauge, render_stats
+# Real imports
+try:
+    from config.settings import settings
+    from src.parsers.pdf_parser import PDFParser
+    from src.agents.resume_optimizer import ResumeOptimizerAgent
+    from src.agents.cover_letter_agent import CoverLetterAgent
+    from src.agents.interview_agent import InterviewAgent
+    from src.agents.skill_gap_agent import SkillGapAgent
+    from src.agents.linkedin_agent import LinkedInAgent
+    from src.agents.email_agent import EmailAgent
+    from src.agents.career_chat_agent import CareerChatAgent
+    from src.utils.history_tracker import HistoryTracker
+    from src.utils.jd_scraper import JobDescriptionScraper
+    from src.utils.pdf_exporter import PDFExporter
+    from ui.components import render_ats_gauge, render_stats
+except ImportError as e:
+    st.error(f"❌ Import Error: {e}")
+    st.info("💡 Hint: Make sure __init__.py files exist in all folders (src, config, ui)")
+    st.stop()
 
 # LangChain imports (optional)
 try:
@@ -37,6 +43,7 @@ try:
     USE_LANGCHAIN = True
 except ImportError:
     USE_LANGCHAIN = False
+
 # ============================================================================
 # PAGE CONFIG
 # ============================================================================
@@ -56,7 +63,7 @@ try:
     settings.validate()
 except Exception as e:
     st.error(f"⚠️ Configuration Error: {e}")
-    st.info("💡 Add GEMINI_API_KEY to your .env file")
+    st.info("💡 Add GEMINI_API_KEY to your .env file (or Streamlit Secrets)")
     st.stop()
 
 # ============================================================================
@@ -275,24 +282,27 @@ with st.sidebar:
     st.markdown("---")
     
     st.markdown("### 📊 Your Statistics")
-    stats = HistoryTracker.get_stats()
-    
-    if stats['total_applications'] > 0:
-        col1, col2 = st.columns(2)
+    try:
+        stats = HistoryTracker.get_stats()
         
-        with col1:
-            st.metric("Applications", stats['total_applications'], delta="Tracked")
-        
-        with col2:
-            st.metric("Avg ATS", f"{stats['avg_ats_score']:.0f}%", delta="Score")
-        
-        # Progress bar
-        progress_pct = min(stats['total_applications'] / 10, 1.0)
-        st.progress(progress_pct)
-        st.caption(f"Applications: {stats['total_applications']}/10")
-    else:
-        st.info("📊 No applications yet")
-        st.caption("Generate your first application to start tracking!")
+        if stats['total_applications'] > 0:
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.metric("Applications", stats['total_applications'], delta="Tracked")
+            
+            with col2:
+                st.metric("Avg ATS", f"{stats['avg_ats_score']:.0f}%", delta="Score")
+            
+            # Progress bar
+            progress_pct = min(stats['total_applications'] / 10, 1.0)
+            st.progress(progress_pct)
+            st.caption(f"Applications: {stats['total_applications']}/10")
+        else:
+            st.info("📊 No applications yet")
+            st.caption("Generate your first application to start tracking!")
+    except Exception:
+        st.warning("Stats unavailable")
     
     st.markdown("---")
     
@@ -966,65 +976,68 @@ with tab4:
 with tab5:
     st.markdown("## 📈 Application Analytics Dashboard")
     
-    hist = HistoryTracker.get_all()
-    
-    if hist:
-        stats = HistoryTracker.get_stats()
+    try:
+        hist = HistoryTracker.get_all()
         
-        # Overview Metrics
-        st.markdown("### 📊 Overview")
-        col1, col2, col3, col4 = st.columns(4)
+        if hist:
+            stats = HistoryTracker.get_stats()
+            
+            # Overview Metrics
+            st.markdown("### 📊 Overview")
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Total Applications", stats['total_applications'])
+            
+            with col2:
+                st.metric("Average ATS Score", f"{stats['avg_ats_score']:.1f}%")
+            
+            with col3:
+                st.metric("Companies", len(stats['companies']))
+            
+            with col4:
+                st.metric("Roles Applied", len(stats['roles']))
+            
+            st.markdown("---")
+            
+            # Application History Table
+            st.markdown("### 📋 Application History")
+            df = pd.DataFrame(hist)
+            df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y-%m-%d %H:%M')
+            
+            display_df = df[['timestamp', 'company', 'role', 'ats_score', 'processing_time']].copy()
+            display_df.columns = ['Date', 'Company', 'Role', 'ATS Score (%)', 'Processing Time (s)']
+            
+            st.dataframe(
+                display_df,
+                use_container_width=True,
+                hide_index=True
+            )
+            
+            # Download History
+            csv = display_df.to_csv(index=False)
+            st.download_button(
+                "📥 Download Application History (CSV)",
+                csv,
+                file_name=f"application_history_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime="text/csv"
+            )
         
-        with col1:
-            st.metric("Total Applications", stats['total_applications'])
-        
-        with col2:
-            st.metric("Average ATS Score", f"{stats['avg_ats_score']:.1f}%")
-        
-        with col3:
-            st.metric("Companies", len(stats['companies']))
-        
-        with col4:
-            st.metric("Roles Applied", len(stats['roles']))
-        
-        st.markdown("---")
-        
-        # Application History Table
-        st.markdown("### 📋 Application History")
-        df = pd.DataFrame(hist)
-        df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y-%m-%d %H:%M')
-        
-        display_df = df[['timestamp', 'company', 'role', 'ats_score', 'processing_time']].copy()
-        display_df.columns = ['Date', 'Company', 'Role', 'ATS Score (%)', 'Processing Time (s)']
-        
-        st.dataframe(
-            display_df,
-            use_container_width=True,
-            hide_index=True
-        )
-        
-        # Download History
-        csv = display_df.to_csv(index=False)
-        st.download_button(
-            "📥 Download Application History (CSV)",
-            csv,
-            file_name=f"application_history_{datetime.now().strftime('%Y%m%d')}.csv",
-            mime="text/csv"
-        )
-    
-    else:
-        st.info("📭 No application history yet")
-        st.markdown("""
-        ### 🚀 Start Tracking Your Applications!
-        
-        Every time you generate materials, we automatically:
-        - ✅ Save the application details
-        - ✅ Track ATS scores
-        - ✅ Record processing times
-        - ✅ Build your analytics dashboard
-        
-        Go to **Generate Materials** to create your first application!
-        """)
+        else:
+            st.info("📭 No application history yet")
+            st.markdown("""
+            ### 🚀 Start Tracking Your Applications!
+            
+            Every time you generate materials, we automatically:
+            - ✅ Save the application details
+            - ✅ Track ATS scores
+            - ✅ Record processing times
+            - ✅ Build your analytics dashboard
+            
+            Go to **Generate Materials** to create your first application!
+            """)
+    except Exception as e:
+        st.error("Error loading analytics database. It will be created on your first application.")
 
 # ============================================================================
 # TAB 6: ABOUT & HELP
