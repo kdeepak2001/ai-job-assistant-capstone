@@ -3,12 +3,19 @@
 Modern UI with LangChain + RAG - Complete Capstone Project
 """
 
+import sys
+import os
 import streamlit as st
 import time
 from datetime import datetime
 import pandas as pd
 
-# Real imports
+# --- 🚨 CRITICAL FIX: Add Root Directory to Path 🚨 ---
+# This line tells Streamlit where to find your 'src' and 'config' folders
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# -----------------------------------------------------
+
+# Real imports (Now these will work!)
 from config.settings import settings
 from src.parsers.pdf_parser import PDFParser
 from src.agents.resume_optimizer import ResumeOptimizerAgent
@@ -30,7 +37,6 @@ try:
     USE_LANGCHAIN = True
 except ImportError:
     USE_LANGCHAIN = False
-
 # ============================================================================
 # PAGE CONFIG
 # ============================================================================
