@@ -7,7 +7,7 @@ load_dotenv()
 class Settings:
     """App configuration for AI Job Assistant."""
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-    MODEL_NAME = "gemini-2.0-flash-exp"
+    MODEL_NAME = "gemini-1.5-flash"
     MAX_FILE_SIZE_MB = 10
     TEMPERATURE = 0.4
     MAX_OUTPUT_TOKENS = 3000
