@@ -347,7 +347,346 @@ if 'chat_agent' not in st.session_state:
             st.session_state.chat_agent = CareerChatAgent()
     else:
         st.session_state.chat_agent = CareerChatAgent()
+# ============================================================================
+# TAB 1: GENERATE MATERIALS
+# ============================================================================
 
+with tab1:
+    st.markdown("## 🎯 Generate Your Job Application Materials")
+    st.markdown("Fill in your details below and let AI create everything you need")
+    
+    # Job Scraper Feature
+    with st.expander("🌐 **Advanced: Auto-Scrape Job Description from URL**", expanded=False):
+        st.markdown("Paste a job posting URL to automatically extract the description")
+        col1, col2 = st.columns([4,1])
+        with col1:
+            jd_url = st.text_input("Job URL", placeholder="https://company.com/careers/job-123", label_visibility="collapsed")
+        with col2:
+            if st.button("🔍 Scrape", use_container_width=True):
+                if jd_url:
+                    with st.spinner("Scraping job description..."):
+                        result = JobDescriptionScraper.scrape_from_url(jd_url)
+                        if result['success']:
+                            st.session_state.scraped_jd = result['job_description']
+                            st.success("✅ Job description extracted!")
+                            st.rerun()
+                        else:
+                            st.error(f"Failed: {result['error']}")
+
+    st.markdown("---")
+
+    # ── STEP 1: INPUT METHOD ──────────────────────────────────────────────────
+    st.markdown("### 📄 Step 1: Choose Input Method")
+    input_method = st.radio(
+        "Input method",
+        ["📝 Paste Text", "📄 Upload PDFs"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("#### 📄 Your Resume")
+        if input_method == "📝 Paste Text":
+            resume_text = st.text_area(
+                "Resume", height=300,
+                value=st.session_state.get('resume_text', ''),
+                placeholder="Paste your complete resume here...",
+                label_visibility="collapsed"
+            )
+        else:
+            resume_file = st.file_uploader(
+                "Upload Resume PDF", type=['pdf'],
+                key="resume_upload", label_visibility="collapsed"
+            )
+            if resume_file:
+                st.success(f"✅ Uploaded: {resume_file.name}")
+
+    with col2:
+        st.markdown("#### 📝 Job Description")
+        if input_method == "📝 Paste Text":
+            jd_text = st.text_area(
+                "Job Description", height=300,
+                value=st.session_state.get('scraped_jd', ''),
+                placeholder="Paste the job description here...",
+                label_visibility="collapsed"
+            )
+        else:
+            jd_file = st.file_uploader(
+                "Upload Job Description PDF", type=['pdf'],
+                key="jd_upload", label_visibility="collapsed"
+            )
+            if jd_file:
+                st.success(f"✅ Uploaded: {jd_file.name}")
+
+    st.markdown("---")
+
+    # ── STEP 2: JOB DETAILS ───────────────────────────────────────────────────
+    st.markdown("### 🏢 Step 2: Job Details")
+    col3, col4 = st.columns(2)
+    with col3:
+        company = st.text_input("Company Name", placeholder="e.g., Google, Microsoft, Amazon")
+    with col4:
+        job_title = st.text_input("Job Title", placeholder="e.g., Data Analyst, Software Engineer")
+
+    st.markdown("---")
+
+    # ── STEP 3: ATS PRE-SCAN ──────────────────────────────────────────────────
+    st.markdown("### 🔍 Step 3: Scan Your Current ATS Score")
+    st.caption("See how well your resume matches the job description BEFORE optimizing")
+
+    scan_btn = st.button("🔍 SCAN ATS SCORE NOW", type="secondary")
+
+    if scan_btn:
+        # collect text based on input method
+        scan_missing = []
+        if input_method == "📝 Paste Text":
+            if not resume_text: scan_missing.append("resume")
+            if not jd_text:     scan_missing.append("job description")
+            resume_scan = resume_text if resume_text else ""
+            jd_scan     = jd_text     if jd_text     else ""
+        else:
+            if 'resume_file' not in locals() or not resume_file: scan_missing.append("resume PDF")
+            if 'jd_file'     not in locals() or not jd_file:     scan_missing.append("JD PDF")
+            resume_scan = ""
+            jd_scan     = ""
+
+        if scan_missing:
+            st.error(f"❌ Please provide: {', '.join(scan_missing)} before scanning")
+        else:
+            with st.spinner("🔍 Calculating your current ATS score..."):
+                # Extract PDF text if needed
+                if input_method == "📄 Upload PDFs":
+                    resume_scan = PDFParser.extract_text(resume_file)
+                    jd_scan     = PDFParser.extract_text(jd_file)
+
+                # Raw keyword match score
+                resume_words = set(resume_scan.lower().split())
+                jd_words     = set(jd_scan.lower().split())
+                if len(jd_words) > 0:
+                    match     = len(resume_words.intersection(jd_words))
+                    raw_score = round(min((match / len(jd_words)) * 100, 95), 1)
+                else:
+                    raw_score = 0
+
+                st.session_state.raw_ats_score  = raw_score
+                st.session_state.resume_scan    = resume_scan
+                st.session_state.jd_scan        = jd_scan
+
+    # Show scan result card
+    if 'raw_ats_score' in st.session_state:
+        score = st.session_state.raw_ats_score
+        st.markdown("#### 📊 Your Current Resume Score")
+
+        col_g, col_t = st.columns([1, 1])
+        with col_g:
+            st.plotly_chart(render_ats_gauge(score), use_container_width=True)
+        with col_t:
+            st.markdown("<br><br>", unsafe_allow_html=True)
+            if score < 50:
+                st.error(f"### ❌ {score}% — Low Match")
+                st.markdown("Your resume has poor keyword alignment with this job. AI optimization is **strongly recommended**.")
+            elif score < 75:
+                st.warning(f"### ⚠️ {score}% — Moderate Match")
+                st.markdown("You have some matching skills but there's room to improve keyword alignment.")
+            else:
+                st.success(f"### ✅ {score}% — Strong Match")
+                st.markdown("Great alignment! AI can still help quantify achievements and improve formatting.")
+
+            st.markdown("---")
+            st.info("👇 Click **Generate All Materials** below to boost this score with AI optimization!")
+
+    st.markdown("---")
+
+    # ── STEP 4: OPTIONS ───────────────────────────────────────────────────────
+    st.markdown("### ⚙️ Step 4: Customization Options")
+    col5, col6, col7 = st.columns(3)
+
+    with col5:
+        strict_ats = st.checkbox("🎯 ATS Strict Mode", value=True, help="Maximum keyword optimization")
+    with col6:
+        include_cover = st.checkbox("✉️ Generate Cover Letter", value=True)
+    with col7:
+        if USE_LANGCHAIN:
+            use_rag = st.checkbox("🧠 Use RAG Enhancement", value=True, help="Uses vector database for context")
+            if use_rag:
+                st.success("✅ RAG Active")
+        else:
+            use_rag = False
+            st.warning("⚠️ RAG Unavailable")
+            st.caption("LangChain not installed")
+
+    st.markdown("---")
+
+    # ── STEP 5: GENERATE ──────────────────────────────────────────────────────
+    st.markdown("### 🚀 Step 5: Generate All Materials")
+
+    gen_btn = st.button("🚀 GENERATE ALL MATERIALS", use_container_width=True, type="primary")
+
+    if gen_btn:
+        missing = []
+        if input_method == "📝 Paste Text":
+            if not resume_text: missing.append('resume')
+            if not jd_text:     missing.append('job description')
+            resume_text_val = resume_text
+            jd_text_val     = jd_text
+        else:
+            if 'resume_file' not in locals() or not resume_file: missing.append('resume PDF')
+            if 'jd_file'     not in locals() or not jd_file:     missing.append('JD PDF')
+
+        if not company:   missing.append('company name')
+        if not job_title: missing.append('job title')
+
+        if missing:
+            st.error(f"❌ Missing fields: {', '.join(missing)}")
+        else:
+            with st.spinner('🤖 AI agents are working...'):
+                progress  = st.progress(0)
+                status    = st.empty()
+                start_time = time.time()
+
+                try:
+                    # Extract PDFs if needed
+                    if input_method == "📄 Upload PDFs":
+                        status.text("📄 Extracting text from resume PDF...")
+                        progress.progress(10)
+                        resume_text_val = PDFParser.extract_text(resume_file)
+                        if not PDFParser.validate_pdf(resume_text_val):
+                            st.error("❌ Resume PDF extraction failed. Try 'Paste Text' method.")
+                            st.stop()
+
+                        status.text("📄 Extracting text from job description PDF...")
+                        progress.progress(15)
+                        jd_text_val = PDFParser.extract_text(jd_file)
+                        if not PDFParser.validate_pdf(jd_text_val):
+                            st.error("❌ Job description PDF extraction failed. Try 'Paste Text' method.")
+                            st.stop()
+
+                    # Store in session
+                    st.session_state.resume_text  = resume_text_val
+                    st.session_state.jd_text      = jd_text_val
+                    st.session_state.company_name = company
+                    st.session_state.job_title    = job_title
+
+                    # Save raw score if not already scanned
+                    if 'raw_ats_score' not in st.session_state:
+                        resume_words = set(resume_text_val.lower().split())
+                        jd_words     = set(jd_text_val.lower().split())
+                        if len(jd_words) > 0:
+                            match = len(resume_words.intersection(jd_words))
+                            st.session_state.raw_ats_score = round(min((match / len(jd_words)) * 100, 95), 1)
+                        else:
+                            st.session_state.raw_ats_score = 0
+
+                    # Initialize agents
+                    status.text("🤖 Initializing AI agents...")
+                    progress.progress(20)
+
+                    if USE_LANGCHAIN and use_rag:
+                        try:
+                            status.text("🔗 Initializing LangChain + RAG...")
+                            resume_agent = LangChainResumeAgent()
+                            st.info("✅ Using LangChain with RAG enhancement")
+                        except Exception:
+                            st.warning("⚠️ LangChain failed, using standard optimizer")
+                            resume_agent = ResumeOptimizerAgent()
+                    else:
+                        resume_agent = ResumeOptimizerAgent()
+                        if not use_rag:
+                            st.info("ℹ️ Using standard optimizer (RAG disabled)")
+
+                    cover_agent      = CoverLetterAgent()
+                    interview_agent  = InterviewAgent()
+                    skill_gap_agent  = SkillGapAgent()
+                    linkedin_agent   = LinkedInAgent()
+                    email_agent      = EmailAgent()
+
+                    # Resume optimization
+                    status.text("✍️ Optimizing resume with AI...")
+                    progress.progress(35)
+                    resume_result = resume_agent.optimize(resume_text_val, jd_text_val)
+                    st.session_state.optimized_resume = resume_result['optimized_resume']
+                    st.session_state.ats_score        = resume_result['ats_score']
+
+                    if resume_result.get('used_rag'):
+                        st.success("✅ RAG enhancement applied!")
+
+                    # Cover letter
+                    if include_cover:
+                        status.text("✍️ Writing personalized cover letter...")
+                        progress.progress(50)
+                        st.session_state.cover_letter = cover_agent.generate(
+                            resume_text_val, jd_text_val, company, job_title
+                        )
+
+                    # Interview prep
+                    status.text("💡 Preparing interview questions & answers...")
+                    progress.progress(65)
+                    st.session_state.interview_prep = interview_agent.generate(
+                        resume_text_val, jd_text_val, job_title
+                    )
+
+                    # Skill gap
+                    status.text("🔍 Analyzing skill gaps...")
+                    progress.progress(75)
+                    st.session_state.skill_gap = skill_gap_agent.analyze(
+                        resume_text_val, jd_text_val
+                    )
+
+                    # LinkedIn
+                    status.text("💼 Optimizing LinkedIn profile...")
+                    progress.progress(85)
+                    st.session_state.linkedin_about    = linkedin_agent.generate_about_section(resume_text_val, job_title)
+                    st.session_state.linkedin_headline = linkedin_agent.generate_headline(resume_text_val, job_title)
+
+                    # Emails
+                    status.text("📧 Generating email templates...")
+                    progress.progress(95)
+                    st.session_state.followup_email = email_agent.generate_followup(company, job_title)
+
+                    # Complete
+                    progress.progress(100)
+                    elapsed = round(time.time() - start_time, 2)
+                    st.session_state.processing_time = elapsed
+
+                    # Save to history
+                    HistoryTracker.add_application({
+                        'company':          company,
+                        'role':             job_title,
+                        'ats_score':        st.session_state.ats_score,
+                        'raw_ats_score':    st.session_state.raw_ats_score,
+                        'processing_time':  elapsed,
+                        'used_rag':         resume_result.get('used_rag', False)
+                    })
+
+                    status.empty()
+                    progress.empty()
+
+                    # ── BEFORE vs AFTER score banner ──────────────────────────
+                    raw       = st.session_state.raw_ats_score
+                    optimized = st.session_state.ats_score
+                    delta     = round(optimized - raw, 1)
+
+                    st.markdown(f"""
+                    <div style="background:linear-gradient(135deg,#11998e,#38ef7d);
+                                padding:1.5rem;border-radius:12px;text-align:center;color:white;">
+                        <h2 style="margin:0;">🎉 Optimization Complete!</h2>
+                        <p style="font-size:1.3rem;margin:0.5rem 0;">
+                            ATS Score: <b>{raw}%</b> → <b>{optimized}%</b>
+                            &nbsp;|&nbsp; <b>+{delta}% improvement</b>
+                        </p>
+                        <p style="margin:0;opacity:0.9;">Completed in {elapsed}s</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    st.balloons()
+                    st.info("👉 Go to the **Results & Export** tab to view and download your materials!")
+
+                except Exception as e:
+                    status.empty()
+                    progress.empty()
+                    st.error(f"❌ Error: {str(e)}")
+                    st.exception(e)
 if 'chat_messages' not in st.session_state:
     st.session_state.chat_messages = []
 
@@ -363,301 +702,6 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📈 Analytics Dashboard",
     "ℹ️ About & Help"
 ])
-
-# ============================================================================
-# TAB 1: GENERATE MATERIALS
-# ============================================================================
-
-with tab1:
-    st.markdown("## 🎯 Generate Your Job Application Materials")
-    st.markdown("Fill in your details below and let AI create everything you need")
-    
-    # Job Scraper Feature
-    with st.expander("🌐 **Advanced: Auto-Scrape Job Description from URL**", expanded=False):
-        st.markdown("Paste a job posting URL to automatically extract the description")
-        col1, col2 = st.columns([4,1])
-        
-        with col1:
-            jd_url = st.text_input("Job URL", placeholder="https://company.com/careers/job-123", label_visibility="collapsed")
-        with col2:
-            if st.button("🔍 Scrape", use_container_width=True):
-                if jd_url:
-                    with st.spinner("Scraping job description..."):
-                        result = JobDescriptionScraper.scrape_from_url(jd_url)
-                        if result['success']:
-                            st.session_state.scraped_jd = result['job_description']
-                            st.success("✅ Job description extracted!")
-                            st.rerun()
-                        else:
-                            st.error(f"Failed: {result['error']}")
-    
-    st.markdown("---")
-    
-    # Input Method
-    st.markdown("### 📄 Step 1: Choose Input Method")
-    input_method = st.radio(
-        "How would you like to provide your documents?",
-        ["📝 Paste Text", "📄 Upload PDFs"],
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("#### 📄 Your Resume")
-        if input_method == "📝 Paste Text":
-            resume_text = st.text_area(
-                "Resume",
-                height=300,
-                value=st.session_state.get('resume_text', ''),
-                placeholder="Paste your complete resume here...",
-                label_visibility="collapsed"
-            )
-        else:
-            resume_file = st.file_uploader(
-                "Upload Resume PDF",
-                type=['pdf'],
-                key="resume_upload",
-                label_visibility="collapsed"
-            )
-            if resume_file:
-                st.success(f"✅ Uploaded: {resume_file.name}")
-    
-    with col2:
-        st.markdown("#### 📝 Job Description")
-        if input_method == "📝 Paste Text":
-            jd_text = st.text_area(
-                "Job Description",
-                height=300,
-                value=st.session_state.get('scraped_jd', ''),
-                placeholder="Paste the job description here...",
-                label_visibility="collapsed"
-            )
-        else:
-            jd_file = st.file_uploader(
-                "Upload Job Description PDF",
-                type=['pdf'],
-                key="jd_upload",
-                label_visibility="collapsed"
-            )
-            if jd_file:
-                st.success(f"✅ Uploaded: {jd_file.name}")
-
-    st.markdown("---")
-    
-    # Job Details
-    st.markdown("### 🏢 Step 2: Job Details")
-    col3, col4 = st.columns(2)
-    
-    with col3:
-        company = st.text_input(
-            "Company Name",
-            placeholder="e.g., Google, Microsoft, Amazon",
-            help="The company you're applying to"
-        )
-    
-    with col4:
-        job_title = st.text_input(
-            "Job Title",
-            placeholder="e.g., Data Analyst, Software Engineer",
-            help="The position you're applying for"
-        )
-
-    st.markdown("---")
-    
-    # Options - FIXED RAG SECTION
-    st.markdown("### ⚙️ Step 3: Customization Options")
-    col5, col6, col7 = st.columns(3)
-    
-    with col5:
-        strict_ats = st.checkbox("🎯 ATS Strict Mode", value=True, help="Maximum keyword optimization")
-    
-    with col6:
-        include_cover = st.checkbox("✉️ Generate Cover Letter", value=True)
-    
-    with col7:
-        if USE_LANGCHAIN:
-            use_rag = st.checkbox("🧠 Use RAG Enhancement", value=True, help="Uses vector database for context from similar resumes")
-            if use_rag:
-                st.success("✅ RAG Active")
-        else:
-            use_rag = False
-            st.warning("⚠️ RAG Unavailable")
-            st.caption("LangChain not installed")
-
-    st.markdown("---")
-    
-    # Generate Button
-    st.markdown("### 🚀 Step 4: Generate")
-    
-    gen_btn = st.button(
-        "🚀 GENERATE ALL MATERIALS",
-        use_container_width=True,
-        type="primary"
-    )
-
-    if gen_btn:
-        # Validation
-        missing = []
-        
-        if input_method == "📝 Paste Text":
-            if not resume_text:
-                missing.append('resume')
-            if not jd_text:
-                missing.append('job description')
-            resume_text_val = resume_text
-            jd_text_val = jd_text
-        else:
-            if 'resume_file' not in locals() or not resume_file:
-                missing.append('resume PDF')
-            if 'jd_file' not in locals() or not jd_file:
-                missing.append('JD PDF')
-        
-        if not company:
-            missing.append('company name')
-        if not job_title:
-            missing.append('job title')
-        
-        if missing:
-            st.error(f"❌ Missing fields: {', '.join(missing)}")
-        else:
-            with st.spinner('🤖 AI agents are working...'):
-                progress = st.progress(0)
-                status = st.empty()
-                start_time = time.time()
-                
-                try:
-                    # Extract PDFs if needed
-                    if input_method == "📄 Upload PDFs":
-                        status.text("📄 Extracting text from resume PDF...")
-                        progress.progress(10)
-                        resume_text_val = PDFParser.extract_text(resume_file)
-                        
-                        if not PDFParser.validate_pdf(resume_text_val):
-                            st.error("❌ Resume PDF extraction failed. Try 'Paste Text' method.")
-                            st.stop()
-                        
-                        status.text("📄 Extracting text from job description PDF...")
-                        progress.progress(15)
-                        jd_text_val = PDFParser.extract_text(jd_file)
-                        
-                        if not PDFParser.validate_pdf(jd_text_val):
-                            st.error("❌ Job description PDF extraction failed. Try 'Paste Text' method.")
-                            st.stop()
-                    
-                    # Store in session
-                    st.session_state.resume_text = resume_text_val
-                    st.session_state.jd_text = jd_text_val
-                    st.session_state.company_name = company
-                    st.session_state.job_title = job_title
-                    
-                    # Initialize agents - FIXED RAG LOGIC
-                    status.text("🤖 Initializing AI agents...")
-                    progress.progress(20)
-                    
-                    # Choose resume optimizer based on RAG selection
-                    if USE_LANGCHAIN and use_rag:
-                        try:
-                            status.text("🔗 Initializing LangChain + RAG...")
-                            resume_agent = LangChainResumeAgent()
-                            st.info("✅ Using LangChain with RAG enhancement - searching vector database for similar successful resumes")
-                        except Exception as e:
-                            st.warning(f"⚠️ LangChain initialization failed, using standard optimizer")
-                            resume_agent = ResumeOptimizerAgent()
-                    else:
-                        resume_agent = ResumeOptimizerAgent()
-                        if not use_rag:
-                            st.info("ℹ️ Using standard optimizer (RAG disabled)")
-                    
-                    cover_agent = CoverLetterAgent()
-                    interview_agent = InterviewAgent()
-                    skill_gap_agent = SkillGapAgent()
-                    linkedin_agent = LinkedInAgent()
-                    email_agent = EmailAgent()
-                    
-                    # Resume optimization - FIXED RAG STATUS
-                    if USE_LANGCHAIN and use_rag:
-                        status.text("✍️ Optimizing resume with RAG context...")
-                        progress.progress(35)
-                        st.info("🧠 RAG: Retrieving context from vector database...")
-                    else:
-                        status.text("✍️ Optimizing resume...")
-                        progress.progress(35)
-                    
-                    resume_result = resume_agent.optimize(resume_text_val, jd_text_val)
-                    st.session_state.optimized_resume = resume_result['optimized_resume']
-                    st.session_state.ats_score = resume_result['ats_score']
-                    
-                    # Show RAG confirmation
-                    if resume_result.get('used_rag'):
-                        st.success("✅ RAG enhancement applied! Used context from knowledge base.")
-                    
-                    # Cover letter
-                    if include_cover:
-                        status.text("✍️ Writing personalized cover letter...")
-                        progress.progress(50)
-                        st.session_state.cover_letter = cover_agent.generate(
-                            resume_text_val, jd_text_val, company, job_title
-                        )
-                    
-                    # Interview prep
-                    status.text("💡 Preparing interview questions & answers...")
-                    progress.progress(65)
-                    st.session_state.interview_prep = interview_agent.generate(
-                        resume_text_val, jd_text_val, job_title
-                    )
-                    
-                    # Skill gap
-                    status.text("🔍 Analyzing skill gaps...")
-                    progress.progress(75)
-                    st.session_state.skill_gap = skill_gap_agent.analyze(
-                        resume_text_val, jd_text_val
-                    )
-                    
-                    # LinkedIn
-                    status.text("💼 Optimizing LinkedIn profile...")
-                    progress.progress(85)
-                    st.session_state.linkedin_about = linkedin_agent.generate_about_section(
-                        resume_text_val, job_title
-                    )
-                    st.session_state.linkedin_headline = linkedin_agent.generate_headline(
-                        resume_text_val, job_title
-                    )
-                    
-                    # Emails
-                    status.text("📧 Generating email templates...")
-                    progress.progress(95)
-                    st.session_state.followup_email = email_agent.generate_followup(
-                        company, job_title
-                    )
-                    
-                    # Complete
-                    progress.progress(100)
-                    elapsed = round(time.time() - start_time, 2)
-                    st.session_state.processing_time = elapsed
-                    
-                    # Save to history
-                    HistoryTracker.add_application({
-                        'company': company,
-                        'role': job_title,
-                        'ats_score': st.session_state.ats_score,
-                        'processing_time': elapsed,
-                        'used_rag': resume_result.get('used_rag', False)
-                    })
-                    
-                    status.empty()
-                    progress.empty()
-                    
-                    st.success(f"🎉 Success! ATS Score: {st.session_state.ats_score}% | Time: {elapsed}s")
-                    st.balloons()
-                    st.info("👉 Go to the **Results & Export** tab to view and download your materials!")
-                    
-                except Exception as e:
-                    status.empty()
-                    progress.empty()
-                    st.error(f"❌ Error: {str(e)}")
-                    st.exception(e)
 
 # ============================================================================
 # TAB 2: RESULTS & EXPORT
