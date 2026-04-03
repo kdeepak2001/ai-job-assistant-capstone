@@ -14,7 +14,7 @@ class Settings:
         except Exception:
             self.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
         
-        self.MODEL_NAME = "gemini-1.5-flash"
+        self.MODEL_NAME = "gemini-2.0-flash"
         self.MAX_FILE_SIZE_MB = 10
         self.TEMPERATURE = 0.4
         self.MAX_OUTPUT_TOKENS = 3000
