@@ -350,9 +350,9 @@ if 'chat_agent' not in st.session_state:
 # ============================================================================
 # TAB 1: GENERATE MATERIALS
 # ============================================================================
-
 with tab1:
     st.markdown("## 🎯 Generate Your Job Application Materials")
+    ...
     st.markdown("Fill in your details below and let AI create everything you need")
     
     # Job Scraper Feature
